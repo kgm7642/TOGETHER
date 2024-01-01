@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <typeAliases>
+    <typeAlias alias="userdto" type="com.project.app.user.dao.UserDTO"/>
+  	<typeAlias alias="boarddto" type="com.project.app.board.dao.BoardDTO"/>
+  	<typeAlias alias="replydto" type="com.project.app.board.dao.ReplyDTO"/>
+  	<typeAlias alias="filedto" type="com.project.app.board.dao.FileDTO"/>
+  	<typeAlias alias="noticedto" type="com.project.app.board.dao.NoticeDTO"/>
+  	<typeAlias alias="moimdto" type="com.project.app.moim.dto.MoimDTO"/>
+  	<typeAlias alias="placedto" type="com.project.app.moim.dto.PlaceDTO"/>
+  	<typeAlias alias="memberdto" type="com.project.app.moim.dto.MemberDTO"/>
+  	<typeAlias alias="firemoimdto" type="com.project.app.moim.dto.FireMoimDTO"/>
+  	<typeAlias alias="followdto" type="com.project.app.moim.dto.FollowDTO"/>
+  	<typeAlias alias="moimjoindto" type="com.project.app.moim.dto.MoimjoinDTO"/>
+  	<typeAlias alias="moimrecruitdto" type="com.project.app.moim.dto.MoimrecruitDTO"/>
+  	<typeAlias alias="moimreplydto" type="com.project.app.moim.dto.MoimreplyDTO"/>
+  	<typeAlias alias="moimchatdto" type="com.project.app.moim.dto.MoimChatDTO"/>
+  	  	
+  </typeAliases>
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+        <property name="username" value="web"/>
+        <property name="password" value="1234"/>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper resource="com/project/mapper/moim.xml"/>
+    <mapper resource="com/project/mapper/user.xml"/>
+    <mapper resource="com/project/mapper/board.xml"/>
+    <mapper resource="com/project/mapper/file.xml"/>
+    <mapper resource="com/project/mapper/admin.xml"/>
+  </mappers>
+</configuration>
+

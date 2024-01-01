@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board">
+
+<!--				게시판 파트 기능 리스트				담당자
+						
+					<게시판 리스트>
+					<게시글 상세>
+					<게시글 댓글>						원희-->
+					
+					
+	<!-- - - - - - <게시판 리스트> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getBoardCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_BOARD
+	</select>
+	
+	
+	<select id="getBoardCntWithKey" resultType="_int" parameterType="string">
+		SELECT COUNT(*) FROM T_BOARD
+		WHERE BOARDTITLE LIKE ('%${keyword}%')
+	</select>
+	
+<!-- - - - - - <SELECT-LIST> - - - - - -->
+		
+	<select id="getBoardList" parameterType="hashmap" resultType="boarddto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_BOARD ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getBoardListWithKey" parameterType="hashmap" resultType="boarddto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_BOARD WHERE BOARDTITLE LIKE ('%${keyword}%') 
+				ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	
+	<!-- - - - - - <게시글 상세> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getDetail" parameterType="_int" resultType="boarddto">
+		SELECT * FROM T_BOARD WHERE BOARDNUM = ${boardnum}
+	</select>
+	
+	<select id="getLastNum" parameterType="string" resultType="_int">
+		SELECT MAX(BOARDNUM) FROM T_BOARD WHERE USERID=#{userid}
+	</select>
+
+	<select id="likecnt" parameterType="_int" resultType="_int">
+		SELECT LIKES FROM T_BOARD WHERE BOARDNUM=#{boardnum}
+	</select>
+	
+	<select id="hatecnt" parameterType="_int" resultType="_int">
+		SELECT DISLIKE FROM T_BOARD WHERE BOARDNUM=#{boardnum}
+	</select>
+	
+	<!-- - - - - - <게시글 댓글> - - - - - -->
+	
+	<!-- - - - - - <SELECT-LIST> - - - - - -->
+	
+	<select id="getReplies" parameterType="_int" resultType="replydto">
+		SELECT * FROM T_REPLY WHERE BOARDNUM=#{boardnum} ORDER BY REPLYNUM DESC
+	</select>
+	
+	
+	<!-- - - - - - <게시글 상세> - - - - - -->
+
+	
+	<!-- - - - - - <INSERT> - - - - - -->
+	
+	
+	<insert id="insertBoard" parameterType="boarddto">
+		INSERT INTO T_BOARD
+		(BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE)
+		VALUES(T_BOARD_SEQ.NEXTVAL, #{userid}, #{boardtitle}, #{contents}, #{category}, SYSDATE, 0, 0, 0)
+	</insert>
+	
+	<!-- - - - - - <게시글 댓글> - - - - - -->
+	
+	<insert id="insertReply" parameterType="replydto">
+		INSERT INTO T_REPLY
+		(REPLYNUM, BOARDNUM, CONTENTS, USERID, REGDATE)
+		VALUES(T_REPLY_SEQ.NEXTVAL, #{boardnum}, #{contents}, #{userid}, SYSDATE)
+	</insert>
+	
+	
+	<!-- - - - - - <게시글 상세> - - - - - -->
+
+	
+	<!-- - - - - - <UPDATE> - - - - - -->
+	
+	
+	<update id="updateBoard" parameterType="boarddto">
+		UPDATE T_BOARD SET BOARDTITLE=#{boardtitle}, CONTENTS = #{contents}, CATEGORY = #{category}
+		WHERE BOARDNUM = #{boardnum}
+	</update>
+	
+	<update id="updateViews" parameterType="_int">
+		UPDATE T_BOARD SET VIEWS = VIEWS+1 WHERE BOARDNUM=#{boardnum}
+	</update>
+	
+	<update id="boardlike" parameterType="_int">
+		UPDATE T_BOARD SET LIKES = LIKES+1 WHERE BOARDNUM=#{boardnum}
+	</update>
+	
+	<update id="boardhate" parameterType="_int">
+		UPDATE T_BOARD SET DISLIKE = DISLIKE+1 WHERE BOARDNUM=#{boardnum}
+	</update>
+	
+	<!-- - - - - - <게시글 댓글> - - - - - -->
+	
+	<update id="modifyReply" parameterType="hashmap">
+		UPDATE T_REPLY SET CONTENTS = #{contents}
+		WHERE REPLYNUM = #{replynum}
+	</update>
+	
+	
+	<!-- - - - - - <게시글 상세> - - - - - -->
+
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+	
+	
+	<delete id="removeBoard" parameterType="_int">
+		DELETE FROM T_BOARD WHERE BOARDNUM=#{boardnum}
+	</delete>
+	
+	<!-- - - - - - <게시글 댓글> - - - - - -->
+	
+	<delete id="deleteReply" parameterType="_int">
+		DELETE FROM T_REPLY WHERE REPLYNUM=#{replynum}
+	</delete>
+	
+	
+	<delete id="deleteBoardReply" parameterType="_int">
+   		DELETE FROM WEB.T_REPLY
+		WHERE BOARDNUM=#{boardnum}
+   	</delete>
+
+	<select id="getIndexBoardCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_BOARD
+	</select>
+	
+	<select id="getIndexBoardList" parameterType="hashmap" resultType="boarddto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_BOARD ORDER BY LIKES DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+		
+	<!-- 공지 -->
+	<select id="getNoticeCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_NOTICE
+	</select>
+		
+	<select id="getNoticeCntWithKey" resultType="_int" parameterType="string">
+		SELECT COUNT(*) FROM T_NOTICE
+		WHERE BOARDTITLE LIKE ('%${keyword}%')
+	</select>
+	
+	
+	<select id="getNoticeList" parameterType="hashmap" resultType="noticedto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_NOTICE ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getNoticeListWithKey" parameterType="hashmap" resultType="noticedto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_NOTICE WHERE BOARDTITLE LIKE ('%${keyword}%') 
+				ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getDetailNotice" parameterType="_int" resultType="noticedto">
+		SELECT * FROM T_NOTICE WHERE BOARDNUM = ${boardnum}
+	</select>
+	
+	<update id="updateNoticeViews" parameterType="_int">
+		UPDATE T_NOTICE SET VIEWS = VIEWS+1 WHERE BOARDNUM=#{boardnum}
+	</update>
+</mapper>

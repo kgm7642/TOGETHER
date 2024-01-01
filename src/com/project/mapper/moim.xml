@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Moim">
+
+
+<!--				모임 파트 기능 리스트					담당자
+						
+					<마이 모임>						지우
+					<모임 생성>						경민
+					<홍보 게시판>						경민
+					<모임 신청 관리>					경민
+					<오늘 모임 리스트 검색>				경민
+					<모임 챗>							경민
+					<모임 검색>						원희
+					<모임 멤버 강퇴>					원희
+					<모임 관리>						원희
+-->
+ 
+ 
+	<!-- - - - - - - - - - - <지우> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <마이 모임> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getPMoimNum" parameterType="_int" resultType="_int">
+ 		SELECT MOIMNUM FROM T_MOIM WHERE PLACENUM = #{placenum}
+ 	</select>
+ 	
+ 	<select id="getMyMoim1Cnt" parameterType="String" resultType="_int">
+		SELECT COUNT(*) FROM T_MOIM WHERE USERID =#{userid}
+	</select>
+
+	<!-- - - - - - <SELECT-LIST> - - - - - -->	
+
+ 	<select id="getMyMoimList1" parameterType="hashmap" resultType="moimdto">
+ 		SELECT ROWNUM R, M.MOIMNUM, M.MOIMNAME, M.USERID, TO_CHAR(M.STARTDATE, 'YYYY-MM-DD') STARTDATE, TO_CHAR(M.ENDDATE, 'YYYY-MM-DD') ENDDATE
+			FROM (SELECT ROWNUM R, mo.* FROM T_MOIM mo ORDER BY MOIMNUM DESC)M 
+			WHERE USERID = #{userid} AND M.R BETWEEN #{startRow} AND #{endRow}
+ 	</select>
+ 	
+ 	<select id="getMyMoimList2" parameterType="hashmap" resultType="moimdto">
+ 		SELECT ROWNUM R, M.MOIMNUM, M.MOIMNAME, M.USERID, 
+ 		TO_CHAR(M.STARTDATE, 'YYYY-MM-DD') STARTDATE, TO_CHAR(M.ENDDATE, 'YYYY-MM-DD') ENDDATE 
+		FROM (SELECT ROWNUM R, MO.* FROM T_MOIM MO
+		JOIN T_MOIMMEMBER MEM ON MO.MOIMNUM = MEM.MOIMNUM WHERE MEM.USERID = #{userid} ORDER BY MO.MOIMNUM DESC)M 
+		WHERE M.R BETWEEN #{startRow} AND #{endRow}
+ 	</select>
+ 	
+ 	
+ 	<!-- - - - - - - - - - - <지우> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <마이 모임> - - - - - -->
+
+	
+	<!-- - - - - - <UPDATE> - - - - - -->
+ 	
+ 	
+ 	<update id="updateMoim" parameterType="moimdto">
+ 		UPDATE T_MOIM SET MOIMNAME= #{moimname}, MOIMTYPE = #{moimtype}, MOIMBUDGET = #{moimbudget},
+ 		STARTDATE= TO_DATE(#{startdate},'YYYY-MM-DD'), ENDDATE =TO_DATE(#{enddate},'YYYY-MM-DD')
+ 		WHERE MOIMNUM = #{moimnum}
+ 	</update>
+ 	
+ 	<update id="updatePlace" parameterType="placedto">
+		UPDATE T_PLACE SET PLACELAT= #{placelat}, PLACELON = #{placelon}, PLACENAME = #{placename}, 
+		PLACEADDR = #{placeaddr}, PLACEROADADDR = #{placeroadaddr}, PLACECATEGORY = #{placecategory}, PLACEPHONENUMBER = #{placephonenumber}
+		WHERE PLACENUM = #{placenum}
+	</update>
+	
+	
+	<!-- - - - - - - - - - - <지우> - - - - - - - - - - -->
+   
+   
+	<!-- - - - - - <index 오늘 나의 모임> - - - - - -->
+
+   
+	<!-- - - - - - <SELECT> - - - - - -->
+   
+	
+	<select id = "getMaxTodayMoimNum" parameterType="String" resultType="_int">
+         SELECT COUNT(MO.MOIMNUM)
+      FROM T_MOIMMEMBER MEM
+      JOIN T_MOIM MO ON MEM.MOIMNUM = MO.MOIMNUM
+      WHERE MEM.USERID = #{userid} AND TO_CHAR(MO.STARTDATE, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+   </select>
+    
+    <select id = "getTodayMoimNum" parameterType="String" resultType="_int">
+         SELECT MO.MOIMNUM
+      FROM T_MOIMMEMBER MEM
+      JOIN T_MOIM MO ON MEM.MOIMNUM = MO.MOIMNUM
+      WHERE MEM.USERID = #{userid} AND TO_CHAR(MO.STARTDATE, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+   </select>
+   
+   	<!-- - - - - - <SELECT-LIST> - - - - - -->
+      
+    <select id = "getTodayMyMoimList" parameterType="hashmap" resultType="moimdto">
+       SELECT MO.*
+      FROM T_MOIMMEMBER MEM
+      JOIN T_MOIM MO ON MEM.MOIMNUM = MO.MOIMNUM
+      WHERE MEM.USERID = #{userid} AND TO_CHAR(MO.STARTDATE, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+    </select>
+ 	
+ 	
+ 	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 생성> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+ 	
+	
+	<select id="selectPlaceNum" resultType="_int">
+      SELECT MAX(PLACENUM) FROM T_PLACE
+	</select>
+   
+    <select id="selectMoimNum" resultType="_int">
+      SELECT MAX(MOIMNUM) FROM T_MOIM
+    </select>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 생성> - - - - - -->
+
+	
+	<!-- - - - - - <INSERT> - - - - - -->
+	
+	
+	<insert id="insertPlace" parameterType="placedto">
+		INSERT INTO T_PLACE
+		(PLACENUM, PLACELAT, PLACELON, PLACENAME, PLACEADDR, PLACEROADADDR, PLACECATEGORY, PLACEPHONENUMBER)
+		VALUES(SEQ_T_PLACE.NEXTVAL, #{placelat}, #{placelon}, #{placename}, #{placeaddr}, #{placeroadaddr}, #{placecategory}, #{placephonenumber})
+	</insert>
+	
+	<insert id="insertMoim" parameterType="moimdto">		
+		INSERT INTO T_MOIM
+		(MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE)
+		VALUES(SEQ_T_MOIM.NEXTVAL, #{moimname}, #{moimtype}, #{moimbudget}, TO_DATE(#{startdate},'YYYY-MM-DD'), 
+		TO_DATE(#{enddate},'YYYY-MM-DD'), #{userid}, #{placenum}, 0)
+	</insert>
+	
+	<insert id="insertMember" parameterType="hashmap">
+		INSERT INTO WEB.T_MOIMMEMBER
+		(MEMBERNUM, USERID, MOIMNUM)
+		VALUES(SEQ_T_M_MEMBER.NEXTVAL, #{userid}, #{moimnum})
+	</insert>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <홍보 게시판> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getBoardCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_MOIMRECRUIT
+	</select>
+	
+	<select id="getBoardCntWithKey" resultType="_int" parameterType="string">
+		SELECT COUNT(*) FROM T_MOIMRECRUIT
+		WHERE RECRUITTITLE LIKE ('%${keyword}%')
+	</select>
+	
+	<select id="getKingId" parameterType="_int" resultType="String">
+		SELECT USERID FROM T_MOIMRECRUIT WHERE RECRUITNUM=#{recruitnum}
+	</select>
+	
+	<select id="getMoim" parameterType="_int" resultType="moimdto">
+		SELECT * FROM T_MOIM WHERE MOIMNUM=${moimnum}
+	</select>
+	
+	<select id="getMoimNumWithRtnum" parameterType="_int" resultType="String">
+		SELECT MOIMNUM FROM T_MOIMRECRUIT WHERE RECRUITNUM=#{recruitnum}
+	</select>
+	
+	<select id="checkAlreadyJoin" parameterType="hashmap" resultType="_int">
+		SELECT COUNT(*) FROM T_MOIMMEMBER WHERE USERID=#{userid} AND MOIMNUM=${moimnum}
+	</select>
+	
+	<select id="checkKing" parameterType="String" resultType="_int">
+		SELECT COUNT(*) FROM T_MOIM WHERE USERID=#{userid}
+	</select>
+	
+	<select id="getLastNum" parameterType="string" resultType="_int">
+		SELECT MAX(RECRUITNUM) FROM T_MOIMRECRUIT WHERE USERID=#{userid}
+	</select>
+	
+	<select id="getRecruitDetail" parameterType="_int" resultType="moimrecruitdto">
+		SELECT * FROM T_MOIMRECRUIT WHERE RECRUITNUM = ${recruitnum}
+	</select>
+	
+	<select id="selectCountReply" parameterType="_int" resultType="_int">
+        SELECT COUNT(*) FROM T_RECRUITREPLY WHERE RECRUITNUM=${recruitnum}
+    </select>
+	
+	<!-- - - - - - <SELECT-LIST> - - - - - -->
+	
+	<select id="getAdMoimList" parameterType="hashmap" resultType="moimrecruitdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIMRECRUIT ORDER BY RECRUITNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getAdMoimListWithKey" parameterType="hashmap" resultType="moimrecruitdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIMRECRUIT WHERE RECRUITTITLE LIKE ('%${keyword}%') 
+				ORDER BY RECRUITNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getReplyList" parameterType="_int" resultType="moimreplydto">
+		SELECT * FROM T_RECRUITREPLY WHERE RECRUITNUM=${recruitnum}
+		ORDER BY REPLYNUM DESC
+	</select>
+	
+	<select id="getMyMoimList" parameterType="String" resultType="moimdto">
+		SELECT * FROM T_MOIM WHERE USERID=#{userid} AND STARTDATE >= SYSDATE
+	</select>
+	
+	<select id="getMoimJoinList" parameterType="_int" resultType="moimjoindto">
+      SELECT * FROM T_MOIMJOIN WHERE MOIMNUM = ${moimnum} ORDER BY MOIMNUM ASC
+   </select>
+   
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <홍보 게시판> - - - - - -->
+
+	
+	<!-- - - - - - <INSERT> - - - - - -->
+	
+	
+	<insert id="insertReply" parameterType="moimreplydto">
+		INSERT INTO T_RECRUITREPLY
+		(REPLYNUM, REPLYWRITER, REPLYCONTENTS, REGDATE, RECRUITNUM)
+		VALUES(SEQ_T_RECRUITREPLY.NEXTVAL, #{replywriter}, #{replycontents}, SYSDATE, ${recruitnum})
+	</insert>
+	
+	<insert id="insertJoinMoim" parameterType="moimjoindto">
+		INSERT INTO WEB.T_MOIMJOIN
+		(MOIMJOINNUM, KINGUSERID, JOINUSERID, MOIMNUM, JOINCONTENTS, REGDATE)
+		VALUES(SEQ_T_MOIMJOIN.NEXTVAL, #{kinguserid}, #{joinuserid}, ${moimnum}, #{joincontents}, SYSDATE)
+	</insert>
+	
+	<insert id="insertRecruit" parameterType="moimrecruitdto">
+		INSERT INTO WEB.T_MOIMRECRUIT
+		(RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE)
+		VALUES(SEQ_T_M_RECRUIT.NEXTVAL, #{recruittitle}, #{userid}, #{recruitcontents}, 0, ${moimnum}, SYSDATE, 0)
+	</insert>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <홍보 게시판> - - - - - -->
+
+	
+	<!-- - - - - - <UPDATE> - - - - - -->
+	
+	
+	<update id="updateReply" parameterType="moimreplydto">
+		UPDATE T_RECRUITREPLY
+		SET REPLYCONTENTS=#{replycontents}, REGDATE=SYSDATE
+		WHERE REPLYNUM=${replynum}
+	</update>
+	
+	<update id="updateReadCnt" parameterType="_int">
+		UPDATE T_MOIMRECRUIT SET READCNT = READCNT+1 WHERE RECRUITNUM=#{recruitnum}
+	</update>
+
+	<update id="updateRecruit" parameterType="moimrecruitdto">
+		UPDATE WEB.T_MOIMRECRUIT
+		SET RECRUITTITLE=#{recruittitle}, RECRUITCONTENTS=#{recruitcontents}, REGDATE=SYSDATE
+		WHERE RECRUITNUM=${recruitnum}
+	</update>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <홍보 게시판> - - - - - -->
+
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+	
+	
+	<delete id="deleteReply" parameterType="_int">
+		DELETE FROM T_RECRUITREPLY
+		WHERE REPLYNUM = #{replynum}
+	</delete>
+	
+	<delete id="removeReply" parameterType="_int">
+		DELETE FROM T_RECRUITREPLY WHERE RECRUITNUM=${recruitnum}
+	</delete>
+	
+	<delete id="removeRecruit" parameterType="_int">
+		DELETE FROM T_MOIMRECRUIT WHERE RECRUITNUM=${recruitnum}
+	</delete>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 신청 관리> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getMoimJoin" parameterType="_int" resultType="moimjoindto">
+		SELECT * FROM T_MOIMJOIN WHERE MOIMJOINNUM = ${moimjoinnum}
+	</select>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 신청 관리> - - - - - -->
+	
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+	
+	
+	<delete id="removeJoinList" parameterType="hashMap">
+		DELETE FROM T_MOIMJOIN WHERE MOIMNUM=${moimnum} and JOINUSERID=#{joinuserid}
+	</delete>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <오늘 모임 리스트 검색> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getTodayMoimList" resultType="moimdto">
+      SELECT * FROM T_MOIM WHERE TO_CHAR(STARTDATE,'YYYYMMDD') = TO_CHAR(SYSDATE,'YYYYMMDD')
+   </select>
+	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 챗> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+    <!-- 채팅 리스트를 가져온다. -->
+	<select id="getChatList" parameterType="_int" resultType="moimchatdto">
+		SELECT * FROM T_MOIMCHAT WHERE MOIMNUM=${moimnum} ORDER BY MOIMCHATNUM
+	</select>
+	
+	<!-- 게시글 몇개인지 검색 0개이상이면 홍보글 삭제할거임 --> 
+	<select id="getIsRecruit" parameterType="_int" resultType="_int">
+   		SELECT COUNT(*) FROM T_MOIMRECRUIT WHERE MOIMNUM = ${moimnum}
+   	</select>
+   	
+	
+	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 챗> - - - - - -->
+
+	
+	<!-- - - - - - <INSERT> - - - - - -->
+   
+   	<!-- 채팅을 DB에 저장 -->
+   	<insert id="insertMoimChat" parameterType="moimchatdto">
+   		INSERT INTO WEB.T_MOIMCHAT
+		(MOIMCHATNUM, USERID, MOIMNUM, MOIMCHATCONTENTS, MOIMCHATDATE)
+		VALUES(SEQ_T_MOIMCHAT.NEXTVAL, #{userid}, ${moimnum}, #{moimchatcontents}, SYSDATE)
+   	</insert>
+   
+   
+   	<!-- - - - - - - - - - - <경민> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 챗> - - - - - -->
+
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+   
+   
+	<!-- 채팅도 삭제해야됨 모임 삭제할 때 -->
+	<delete id="deleteChat" parameterType="_int">
+			DELETE FROM T_MOIMCHAT WHERE MOIMNUM=${moimnum}
+	</delete>
+   
+	
+	<!-- - - - - - - - - - - <원희> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 검색> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getMoimCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_MOIM
+	</select>
+	
+	<select id="getMoimCntWithKey" resultType="_int" parameterType="string">
+		SELECT COUNT(*) FROM T_MOIM
+		WHERE MOIMNAME LIKE ('%${keyword}%')
+	</select>
+	
+	<select id="getMPlaceNum" parameterType="_int" resultType="_int">
+		SELECT PLACENUM FROM T_MOIM WHERE MOIMNUM = #{moimnum}
+	</select>
+	
+	<select id="getDetail" parameterType="_int" resultType="moimdto">
+		SELECT * FROM T_MOIM WHERE MOIMNUM = ${moimnum}
+	</select>
+	
+	<select id="getPlaceDetail" parameterType="_int" resultType="placedto">
+		SELECT * FROM T_PLACE WHERE PLACENUM=#{placenum}
+	</select>
+	
+	<select id="getMemberInfo" parameterType="String" resultType="userdto">
+		SELECT * FROM T_USER WHERE USERID=#{userid}
+	</select>
+	
+	<!-- - - - - - <SELECT-LIST> - - - - - -->
+	
+	<select id="getMoimList" parameterType="hashmap" resultType="moimdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIM ORDER BY MOIMNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow} AND ENDDATE > SYSDATE
+	</select>
+	
+	<select id="getMoimListWithKey" parameterType="hashmap" resultType="moimdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIM WHERE MOIMNAME LIKE ('%${keyword}%') 
+				ORDER BY MOIMNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getUserid" parameterType="_int" resultType="String">
+		SELECT USERID FROM T_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</select>	
+	
+	<!-- - - - - - - - - - - <원희> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 멤버 강퇴> - - - - - -->
+
+	
+	<!-- - - - - - <INSERT> - - - - - -->
+	
+	
+	<insert id="fireMessage" parameterType="firemoimdto">
+		INSERT INTO T_FIREMOIM
+		VALUES(#{userid}, #{moimnum}, #{message})
+	</insert>
+	
+	
+	<!-- - - - - - - - - - - <원희> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 멤버 강퇴> - - - - - -->
+
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+	
+	
+	<delete id="fireMember" parameterType="String">
+		DELETE FROM T_MOIMMEMBER WHERE USERID=#{userid}
+	</delete>
+	
+	
+	<!-- - - - - - - - - - - <원희> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 관리> - - - - - -->
+
+	
+	<!-- - - - - - <SELECT> - - - - - -->
+	
+	
+	<select id="getRecruitnums" parameterType="_int" resultType="Integer">
+		SELECT RECRUITNUM FROM T_MOIMRECRUIT
+		WHERE MOIMNUM=${moimnum}
+	</select>
+	
+	<select id="getBanUser" parameterType="String" resultType="firemoimdto">
+ 		SELECT * FROM T_FIREMOIM WHERE USERID = #{userid}
+ 	</select>
+	
+	
+	<!-- - - - - - - - - - - <원희> - - - - - - - - - - -->
+	
+	
+	<!-- - - - - - <모임 관리> - - - - - -->
+
+	
+	<!-- - - - - - <DELETE> - - - - - -->
+	
+	
+	<delete id="deleteMembers">
+		DELETE FROM T_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</delete>
+	
+	<delete id="deleteFireMoim">
+		DELETE FROM T_FIREMOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+	
+	<delete id = "deleteMoimJoin">
+		DELETE FROM T_MOIMJOIN
+		WHERE MOIMNUM = #{moimnum}
+	</delete>
+
+	<delete id="deleteRReply" parameterType="_int">
+		DELETE FROM T_RECRUITREPLY
+		WHERE RECRUITNUM = #{recruitnum}
+	</delete>
+
+	<delete id="deleteRecruit">
+		DELETE FROM T_MOIMRECRUIT
+		WHERE RECRUITNUM = #{recruitnum}
+	</delete>
+	
+	<delete id="deleteMoim" parameterType="_int">
+		DELETE FROM T_MOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+	
+	<delete id="deletePlace" parameterType="_int">
+ 		DELETE FROM T_PLACE WHERE PLACENUM=#{placenum}
+ 	</delete>
+
+	<delete id="banCheck" parameterType="String">
+ 		DELETE FROM T_FIREMOIM WHERE MESSAGE=#{message}
+ 	</delete>
+ 	
+ 	<delete id="outMoim" parameterType="hashmap">
+ 		DELETE FROM T_MOIMMEMBER WHERE MOIMNUM = ${moimnum} AND USERID = #{userid}
+ 	</delete>
+ 	
+ 	<select id="getDislike" parameterType="_int" resultType="_int">
+ 		SELECT DISLIKE FROM T_MOIM WHERE MOIMNUM = ${moimnum}
+ 	</select>
+ 	
+ 	<update id="updateDislike" parameterType="_int">
+ 		UPDATE WEB.T_MOIM
+		SET DISLIKE=DISLIKE+1
+		WHERE MOIMNUM = ${moimnum}
+ 	</update>
+ 	
+ 	<select id="getDislikeRecruitnum" parameterType="_int" resultType="_int">
+ 		SELECT DISLIKE FROM T_MOIMRECRUIT WHERE RECRUITNUM = ${recruitnum}
+ 	</select>
+ 	
+ 	<update id="updateDislikeRecruitnum" parameterType="_int">
+ 		UPDATE WEB.T_MOIMRECRUIT
+		SET DISLIKE=DISLIKE+1
+		WHERE RECRUITNUM = ${recruitnum}
+ 	</update>
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Admin">
+	<select id="getMoimListAdmin" parameterType="hashmap" resultType="moimdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIM ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow} AND ENDDATE > SYSDATE
+	</select>
+	
+	<select id="getMoimListWithKeyAdmin" parameterType="hashmap" resultType="moimdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIM WHERE MOIMNAME LIKE ('%${keyword}%') 
+				ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getAdMoimListAdmin" parameterType="hashmap" resultType="moimrecruitdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIMRECRUIT ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getAdMoimListWithKeyAdmin" parameterType="hashmap" resultType="moimrecruitdto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_MOIMRECRUIT WHERE RECRUITTITLE LIKE ('%${keyword}%') 
+				ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getBoardListAdmin" parameterType="hashmap" resultType="boarddto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_BOARD ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getBoardListWithKeyAdmin" parameterType="hashmap" resultType="boarddto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_BOARD WHERE BOARDTITLE LIKE ('%${keyword}%') 
+				ORDER BY DISLIKE DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	
+	<!-- 공지사항 -->
+	<select id="getNoticeList" parameterType="hashmap" resultType="noticedto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_NOTICE ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<select id="getNoticeListWithKeyAdmin" parameterType="hashmap" resultType="noticedto">
+		SELECT * FROM
+			(SELECT ROWNUM R, D.* FROM
+				(SELECT * FROM T_NOTICE WHERE BOARDTITLE LIKE ('%${keyword}%') 
+				ORDER BY BOARDNUM DESC) D
+			) B
+		WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<insert id="insertNotice" parameterType="noticedto">
+		INSERT INTO T_NOTICE
+		(BOARDNUM, USERID, BOARDTITLE, CONTENTS, REGDATE, VIEWS)
+		VALUES(T_NOTICE_SEQ.NEXTVAL, #{userid}, #{boardtitle}, #{contents}, SYSDATE, 0)
+	</insert>
+	
+	<select id="getLastNumNotice" parameterType="string" resultType="_int">
+		SELECT MAX(BOARDNUM) FROM T_NOTICE WHERE USERID=#{userid}
+	</select>
+	
+	<select id="getDetailNotice" parameterType="_int" resultType="noticedto">
+		SELECT * FROM T_NOTICE WHERE BOARDNUM = ${boardnum}
+	</select>
+	
+	<update id="updateNotice" parameterType="noticedto">
+		UPDATE T_NOTICE SET BOARDTITLE=#{boardtitle}, CONTENTS = #{contents}
+		WHERE BOARDNUM = #{boardnum}
+	</update>
+	
+	<delete id="removeNotice" parameterType="_int">
+		DELETE FROM T_NOTICE WHERE BOARDNUM=#{boardnum}
+	</delete>
+	
+	<select id="getNoticeCnt" resultType="_int">
+		SELECT COUNT(*) FROM T_NOTICE
+	</select>
+	
+	<select id="getNoticeCntWithKey" resultType="_int" parameterType="string">
+		SELECT COUNT(*) FROM T_NOTICE
+		WHERE BOARDTITLE LIKE ('%${keyword}%')
+	</select>
+</mapper>

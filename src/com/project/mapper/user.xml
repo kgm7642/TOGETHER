@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="User">
+	<select id="checkId" parameterType="string" resultType="_int">
+		SELECT
+		COUNT(*) FROM T_USER WHERE USERID = #{userid}
+	</select>
+	<select id="login" parameterType="hashmap" resultType="_int">
+		SELECT
+		COUNT(*) FROM T_USER WHERE USERID=#{userid} AND USERPW=#{userpw}
+	</select>
+
+	<!-- 아이디찾기 -->
+	<select id="findId" parameterType="hashmap" resultType="String">
+		SELECT
+		USERID FROM T_USER WHERE USERNAME= #{username} AND
+		USERPHONE=#{userphone}
+	</select>
+
+	<select id="findpw" parameterType="hashmap" resultType="String">
+		SELECT
+		USERPW FROM T_USER WHERE USERID= #{userid} AND USERPHONE=#{userphone}
+	</select>
+
+	<!-- MyPage -->
+	<select id="myPage" parameterType="string" resultType="_int">
+		SELECT
+		COUNT(*) FROM T_USER WHERE USERID=#{userid}
+	</select>
+
+	<!-- MyInfoUpdate -->
+	<update id="updatemyinfo" parameterType="userdto">
+		UPDATE T_USER SET USERID = #{userid}, USERNAME = #{username},
+		USERPW = #{userpw}, USERADDR = #{useraddr}, USERADDRD = #{useraddrd},
+		USERPHONE = #{userphone}, USEREMAIL = #{useremail}
+		WHERE USERID=#{userid}
+	</update>
+	
+	<select id="getUser" parameterType="String" resultType="userdto">
+		SELECT *
+		FROM T_USER WHERE USERID=#{userid}
+	</select>
+
+	<select id="getDetail" parameterType="String"
+		resultType="userdto">
+		SELECT * FROM T_USER WHERE USERID=#{userid}
+	</select>
+
+
+	<!-- Friend -->
+
+	<select id="findFriend" parameterType="String"
+		resultType="userdto">
+		SELECT * FROM T_USER WHERE USERID=#{userid}
+	</select>
+
+	<select id="plusFriend" parameterType="String"
+		resultType="userdto">
+		SELECT * FROM T_USER WHERE USERID=#{userid}
+	</select>
+
+	<insert id="join" parameterType="userdto">
+		INSERT INTO WEB.T_USER
+		(USERID, USERPW, USERNAME, USERADDR, USERADDRD, USERPHONE, USEREMAIL, USERGENDER, REGDATE)
+		VALUES(#{userid}, #{userpw}, #{username}, #{useraddr}, #{useraddrd}, #{userphone}, #{useremail}, #{usergender}, SYSDATE)
+	</insert>
+
+	<!-- 친구추가 -->
+
+	<insert id="insertMyFriend" parameterType="followdto">
+		INSERT INTO WEB.FOLLOW
+		VALUES(FOLLOW_SEQ.NEXTVAL, #{userid}, #{followid}, SYSDATE)
+	</insert>
+
+
+	<!-- 유효성검사 -->
+	<select id="friendId" parameterType="String" resultType="_int">
+		SELECT COUNT(*) FROM FOLLOW WHERE USERID = #{userid} AND FOLLOWID = #{followid}
+	</select>
+	
+	<select id="findFriendtwo" parameterType="String" resultType="followdto">
+		SELECT * FROM FOLLOW WHERE FOLLOWID=#{followid}
+	</select>
+
+   
+	<!-- 친구 리스트 -->	
+	<select id="getFUserid" parameterType="String" resultType="String">
+		SELECT USERID FROM FOLLOW WHERE USERID=#{userid}
+	</select>
+	
+	<select id="listFriend" parameterType="String" resultType="followdto">
+		SELECT * FROM FOLLOW WHERE USERID=#{userid}
+	</select>
+	
+	<!-- 팔로잉 -->
+	
+	<select id="followingList" parameterType="String"
+		resultType="followdto">
+		SELECT * FROM FOLLOW WHERE FOLLOWID=#{userid}
+	</select>
+	
+	<delete id="deleteMyFriend" parameterType="hashmap">
+		DELETE FROM FOLLOW WHERE USERID=#{userid} AND FOLLOWID=#{followid}
+	</delete>
+	
+	<!-- 친구 중복 검사 -->
+	<!-- <select id="checkFriend" parameterType="hashmap" resultType="_int">
+         SELECT COUNT(*) FROM FOLLOW WHERE FOLLOWID=#{followid} AND USERID=#{userid}
+   </select> -->
+   
+   <select id="getIndexFollowCnt" resultType="_int">
+		SELECT COUNT(*) FROM FOLLOW
+	</select>
+	
+	<select id="getIndexFriendList" parameterType="hashmap" resultType="followdto">
+		SELECT * FROM
+            (SELECT ROWNUM R, D.* FROM
+                (SELECT * FROM FOLLOW WHERE USERID=#{userid} ORDER BY FOLLOWNUM DESC) D
+            ) B
+        WHERE B.R BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+   	<!-- 회원 탈퇴 SQL문 -->
+   
+   <!-- 강퇴 삭제 -->
+   	<delete id="deleteFire" parameterType="String">
+   		DELETE FROM WEB.T_FIREMOIM
+		WHERE USERID=#{userid}
+   	</delete>
+
+	<!-- 채팅 삭제 -->
+   	<delete id="deleteChat" parameterType="String">
+   		DELETE FROM WEB.T_MOIMCHAT
+		WHERE USERID=#{userid}
+   	</delete>
+   	
+   	<!-- 가입신청 삭제(내가한거) -->
+   	<delete id="deleteJoinJ" parameterType="String">
+   		DELETE FROM WEB.T_MOIMJOIN
+		WHERE JOINUSERID=#{userid}
+   	</delete>
+   	
+   	<!-- 가입신청 삭제(내가 받은거) -->
+   	<delete id="deleteJoinK" parameterType="String">
+   		DELETE FROM WEB.T_MOIMJOIN
+		WHERE KINGUSERID=#{userid}
+   	</delete>
+   	
+   	<!-- 멤버 삭제 -->
+   	<delete id="deleteMember" parameterType="String">
+   		DELETE FROM WEB.T_MOIMMEMBER
+		WHERE USERID=#{userid}
+   	</delete>
+   	
+	<!-- 모임NUM 전부 검색해서 LIST로 리턴 -->
+   	<select id="selectMoimNum" parameterType="String" resultType="Integer">
+   		SELECT MOIMNUM FROM T_MOIM
+   		WHERE USERID=#{userid}
+   	</select>
+
+	<!-- 보드NUM 전부 검색해서 LIST로 리턴 -->
+   	<select id="selectBoardNum" parameterType="String" resultType="Integer">
+   		SELECT BOARDNUM FROM T_BOARD
+   		WHERE USERID=#{userid}
+   	</select>
+   	
+   	<!-- 보드 댓글 삭제 -->
+   	<delete id="deleteBoardReply" parameterType="String">
+   		DELETE FROM WEB.T_REPLY
+		WHERE USERID=#{userid}
+   	</delete>
+   	
+   	<!-- 보드 삭제 -->
+   	<delete id="deleteBoard" parameterType="String">
+   		DELETE FROM WEB.T_BOARD
+		WHERE USERID=#{userid}
+   	</delete>
+   	
+   	<!-- 친구 삭제(팔로우) -->
+   	<delete id="dellteFollowU" parameterType="String">
+   		DELETE FROM WEB.FOLLOW
+		WHERE USERID=#{userid}
+   	</delete>
+   	
+   	<!-- 친구 삭제(팔로잉) -->
+   	<delete id="deleteFollowF" parameterType="String">
+   		DELETE FROM WEB.FOLLOW
+		WHERE FOLLOWID=#{userid}
+   	</delete>
+   	
+   	<!-- 유저 삭제 -->
+   	<delete id="deleteUser" parameterType="String">
+   		DELETE FROM WEB.T_USER
+		WHERE USERID=#{userid}
+   	</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
