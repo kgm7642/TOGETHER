@@ -491,9 +491,30 @@ table, tr, th, td {
 			}
 		}
 	
-		//이미 모임 회원인지 확인
+		// 오늘 날짜를 구해줌
+		let today = new Date();
+		let year = today.getFullYear();
+		let month = ('0' + (today.getMonth() + 1)).slice(-2);
+		let day = ('0' + today.getDate()).slice(-4);
+		
+		let moimTodayYear = "${moim.startdate}".slice(0,4);
+		let moimTodayMonth = "${moim.startdate}".slice(5,7);
+		let moimTodayDay = "${moim.startdate}".slice(8,11);
+		
+		console.log(year>moimTodayYear);
+		console.log(month>moimTodayMonth);
+		console.log(day>moimTodayDay);
+		
 		let checkjoin = document.getElementById("checkjoin");
 		function joinMoim(){
+			if(year>moimTodayYear) {
+				if(month>moimTodayMonth) {
+					if(day>moimTodayDay) {
+						alert("모임의 기한이 지났습니다.");
+						return;		
+					}
+				}
+			}			
 			if(confirm("정말 가입하시겠습니까?")){
 				checkAlreadyJoin();
 				setTimeout(function() {
@@ -505,6 +526,8 @@ table, tr, th, td {
 				}, 500);
 			}
 		}
+		
+		//이미 모임 회원인지 확인
 		function checkAlreadyJoin(){
 			let userid = "${session.userid}";
 			let xhr = new XMLHttpRequest();
