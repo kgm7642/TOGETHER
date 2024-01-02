@@ -555,8 +555,6 @@ table, tr, th, td {
 			window.open("${pageContext.request.contextPath}/moim/ApplyMoimInfo.mo?moimnum="+${moim.moimnum},"apply","width=700,height=700");
 		}
 	
-	
-	
 		console.log("${member.usernickname}")
 		console.log("${member.userphone}")
 		console.log("${member.useremail}")
