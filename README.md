@@ -117,10 +117,13 @@
 <br>
    - 서비스를 이용하기 전 회원가입을 진행 <br>
    - 아이디는 기본키(primary key)이기 때문에 중복되면 안됨 <br>
-     &nbsp;&nbsp;Ajax를 사용해 아이디 중복검사 기능 구현 -> 중복된 아이디로는 회원가입 불가능 <br>
-     &nbsp;&nbsp;아이디 중복으로 인한 DB 오류 문제 해결 <br>
+     &nbsp;&nbsp;&nbsp;Ajax를 사용해 아이디 중복검사 기능 구현 <br>
+     &nbsp;&nbsp;&nbsp;-> 중복된 아이디로는 회원가입 불가능 <br>
+     &nbsp;&nbsp;&nbsp;-> 아이디 중복으로 인한 DB 오류 문제 해결 <br>
    - 주소 API를 사용해 사용자가 편리하게 자신의 주소를 입력 <br>
-   - 모든 항목을 작성해야 회원가입이 가능하도록 자바스크립트를 사용해 유효성 검사 진행
+   - 회원가입시 아무런 정보를 입력하지 않고 회원가입을 진행했을때 null상태의 유저DTO가 서버에 넘어오는 문제 발견
+     &nbsp;&nbsp;&nbsp;-> 모든 항목을 작성해야 회원가입이 가능하도록 자바스크립트를 사용해 유효성 검사 진행
+     &nbsp;&nbsp;&nbsp;-> 무작위한 회원가입 방지
 <br><hr><br><br>
 
 ### [모임생성]<br>
@@ -128,7 +131,7 @@
 ![JSP02](https://github.com/kgm7642/JSP_MOIM_project/assets/85470797/736528a7-918b-41da-89ac-d4932be2dae5)
 <br>
    - KaKao Map Api를 활용해 모임생성시 위치정보 DB 저장 기능 구현 <br>
-     &nbsp;&nbsp;지도 사용성 향상 - 모임정보를 처음 확인하는 유저도 지도를 보고 모임장소가 어디인지 빠르게 파악 가능
+     &nbsp;&nbsp;&nbsp;지도 사용성 향상 -> 모임정보를 처음 확인하는 유저도 지도를 보고 모임장소가 어디인지 빠르게 파악 가능
 <br><hr><br><br>
 
 ### [모임홍보]<br>
@@ -136,9 +139,9 @@
 ![JSP03](https://github.com/kgm7642/JSP_MOIM_project/assets/85470797/9c38cbbb-935f-4114-a3f9-edebde572868)
 <br>
    - 생성한 모임을 게시판에서 홍보 <br>
-     &nbsp;&nbsp;작성 가능한 모임 리스트중 이미 기간이 지난 모임도 보여지는 문제점 발견 <br>
-     &nbsp;&nbsp;-> SELECT * FROM T_MOIM WHERE USERID=#{userid} AND STARTDATE >= SYSDATE <br>
-     &nbsp;&nbsp;모임시작 날짜와 오늘 날짜를 비교해 지난 모임은 보이지 않게 수정 <br>
+     &nbsp;&nbsp;&nbsp;작성 가능한 모임 리스트중 이미 기간이 지난 모임도 보여지는 문제점 발견 <br>
+     &nbsp;&nbsp;&nbsp;-> SELECT * FROM T_MOIM WHERE USERID=#{userid} AND STARTDATE >= SYSDATE <br>
+     &nbsp;&nbsp;&nbsp;-> 모임시작 날짜와 오늘 날짜를 비교해 지난 모임은 보이지 않게 수정 <br>
    - 모임생성 과정에서 미리 저장해놓은 위치정보를 통해 모임홍보게시글에서 정확한 모임장소를 쉽게 확인 가능
    - 게시글의 댓글은 Ajax를 사용해 페이지 이동 없이 바로 등록되도록 구현
 <br><hr><br><br>
@@ -148,6 +151,11 @@
 ![JSP04](https://github.com/kgm7642/JSP_MOIM_project/assets/85470797/6c861fe9-181a-4015-aea8-5c77b918a1a1)
 <br>
    - 사용자가 적절한 사유와 함께 모임에 가입신청서를 보냄
+   - 이미 모임의 회원인데도 중복해서 가입신청서를 보낼 수 있는 오류 발견
+     &nbsp;&nbsp;&nbsp;-> Ajax를 사용해 이미 모임 회원인지 확인 <br>
+     &nbsp;&nbsp;&nbsp;-> 이미 모임 회원일경우 "이미 가입되어 있는 모임입니다." 알림을 뜨게함
+   - 기간이 지난 모임에 가입신청을 할 수 있는 오류를 발견함
+     &nbsp;&nbsp;&nbsp;-> 가입신청시 모임 시작 날짜와 오늘 날짜를 비교해 기한이 지났다면 가입이 불가능하도록 수정
 <br><hr><br><br>
 
 ### [모임가입관리]<br>
@@ -171,6 +179,8 @@
 <br>
    - 가장 아쉬웠던 모임채팅입니다. WebSocket을 사용해 실시간으로 구현하려했지만 실패했습니다.
    - 한쪽 유저가 채팅을 입력한 후 조금의 시간이 지나야 다른 유저가 채팅을 확인할 수 있습니다.
+
+   - 
 <br><hr><br><br>
 
 ### [모임추방]<br>
