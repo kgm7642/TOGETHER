@@ -546,6 +546,8 @@ table, tr, th, td {
 			}
 		}
 		
+		
+		
 		//채팅방으로 이동하는 함수
 		function goChat(){
 			window.open("${pageContext.request.contextPath}/moim/MoimChat.mo?moimnum="+${moim.moimnum},"chat","width=700,height=900");
